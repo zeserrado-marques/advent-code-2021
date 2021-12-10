@@ -5,22 +5,74 @@ Oxygen and CO2 rating
 
 '''
 
-def removeItemsFromList(lista: list, condition):
-    delete_counter = 0
-    for index in range(len(lista)):
-        elemento = lista[index-delete_counter]
-        if elemento == condition:
-            lista.pop(index-delete_counter)
-            delete_counter+=1
-    return lista
+def getOnesAndZeros(num_list: list, column):
+    zero_count = 0
+    one_count = 0
+    for j in range(len(num_list)):
+        current_bit = num_list[j][column]
+        if current_bit == 1:
+            one_count += 1
+        else:
+            zero_count += 1
+    return one_count, zero_count
+
+def bitToRemove(is_oxygen: bool, current_bit):
+    '''if the criteria is oxygen, we want to keep the current bit, which is the most common.
+        it's the other way around for carbon
+    '''
+    if current_bit == 1:
+        if is_oxygen:
+            return 0
+        else:
+            return current_bit
+    elif current_bit == 0:
+        if is_oxygen:
+            return 1
+        else:
+            return current_bit
+    else:
+        print('not a binary number. quiting macro')
+        quit()
 
 
-#fhand = open('input.txt')
-fhand = open('test.txt')
+def ratingGetter(num_list: list, i: int, is_oxygen: bool):
+    '''
+        where the magic happens
+    '''
+    ola = num_list.copy()
+    
+    one_count, zero_count = getOnesAndZeros(ola, i)
+    print(one_count, zero_count)
+
+    # list with numbers to be removed
+    if one_count >= zero_count:
+        most_common_bit = 1
+        bit_to_remove = bitToRemove(is_oxygen, most_common_bit)
+        for number in num_list:
+            current_column = number[i]
+            if current_column == bit_to_remove:
+                # it's better to remove the first ocurrence of the element, instead of using pop() for the index of the element
+                ola.remove(number)
+    else:
+        most_common_bit = 0
+        bit_to_remove = bitToRemove(is_oxygen, most_common_bit)
+        for number in num_list:
+            current_column = number[i]
+            if current_column == bit_to_remove:
+                ola.remove(number)
+    # verifies if we have one number. if not, we run the function again
+    if len(ola) == 1:
+        return ola[0]
+    else:
+        return ratingGetter(ola, i+1, is_oxygen)
+    
+
+fhand = open('input.txt')
+#fhand = open('test.txt')
 
 num_list = list()
 
-# insert file into an nparray
+# insert file into a list. this will be a list of lists
 for line in fhand:
     line = line.rstrip()
     a = [int(i) for i in line]
@@ -29,29 +81,40 @@ for line in fhand:
 
 
 col_size = range(len(a))
-row_size = range(len(num_list))
+#row_size = range(len(num_list))
+ola = num_list.copy()
+
+oxygen = ratingGetter(num_list, 0, True)
+carbon = ratingGetter(num_list, 0, False)
+oxygen = ''.join([str(elm) for elm in oxygen])
+carbon = ''.join([str(elm) for elm in carbon])
+
+total = int(oxygen, 2) * int(carbon, 2)
+print(oxygen, carbon)
+print(total)
+quit()
 
 for i in col_size:
-    zero_count = 0
-    one_count = 0
-    for j in row_size:
-        current_bit = num_list[j][i]
-        if current_bit == 1:
-            one_count += 1
-        else:
-            zero_count += 1
+    one_count, zero_count = getOnesAndZeros(ola, i)
     print(one_count, zero_count)
 
     # list with numbers to be removed
     if one_count >= zero_count:
-        ola = num_list[:]
-        for number_index in range(len(num_list)):
-            
-            number = num_list[number_index]
-            current_coluna = number[i]
-            if current_coluna == 0:
-                ola.pop(i)
-                
+        most_common_bit = 1
+        bit_to_remove = bitToRemove(True, most_common_bit)
+        print(bit_to_remove)
+        for number in num_list:
+            current_column = number[i]
+            if current_column == bit_to_remove:
+                # it's better to remove the first ocurrence of the element, instead of using pop() for the index of the element
+                ola.remove(number)
+    else:
+        for number in num_list:
+            current_column = number[i]
+            if current_column == 1:
+                ola.remove(number)
+    if len(ola) == 1:
         break
+    break
 
 print(ola)
