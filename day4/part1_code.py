@@ -48,8 +48,10 @@ for number in draw_numbers:
         for y in card:
             for x in y:
                 if number == x:
+                    # this is the code that finds the drawn number in the bingo card
                     result = np.where(card == x)
                     coordinate = (int(result[0]), int(result[1]))
+                    # insert 1 in corresponding score card. 0 = not found. 1 = found
                     score_card = scores_collection[card_key]
                     score_card[coordinate[0], coordinate[1]] = 1
                     print(score_card)
