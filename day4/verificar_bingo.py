@@ -24,6 +24,6 @@ l2[:,2] = 1
 l3[3,0:4] = 1
 
 
-print(type(l1))
+print(l2)
 
 verifyBingo(l2)
